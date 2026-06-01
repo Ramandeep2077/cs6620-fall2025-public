@@ -49,7 +49,8 @@ jobs:
       - name: Deploy to EC2 via SSM
         run: |
           aws ssm send-command \
-            --instance-ids ${{ secrets.EC2_INSTANCE_ID }} \
+            --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
             --document-name "AWS-RunShellScript" \
             --comment "Automated deployment from GitHub Actions" \
-            --parameters
+            --parameters commands='["docker pull ${{ secrets.DOCKERHUB_USERNAME }}/cs6620-app:latest","docker stop cs6620-app || true","docker rm cs6620-app || true","docker run -d --name cs6620-app --restart unless-stopped -p 80:5000 ${{ secrets.DOCKERHUB_USERNAME }}/cs6620-app:latest"]' \
+            --region "${{ secrets.AWS_REGION }}"
